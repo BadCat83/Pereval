@@ -160,15 +160,15 @@ components:
         id:
           type: integer
           readOnly: true
-        first_name:
+        name:
           type: string
-        last_name:
+        fam:
           type: string
-        surname:
+        otc:
           type: string
         email:
           type: string
-        phone_number:
+        phone:
           type: string
 
     Coordinates:
