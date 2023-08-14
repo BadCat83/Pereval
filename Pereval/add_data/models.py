@@ -5,7 +5,7 @@ class User(models.Model):
     first_name = models.CharField(max_length=100, verbose_name='Имя')
     last_name = models.CharField(max_length=100, verbose_name='Фамилия')
     surname = models.CharField(max_length=100, blank=True, verbose_name='Отчество')
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=16)
 
 
