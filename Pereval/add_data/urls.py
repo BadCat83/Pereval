@@ -1,15 +1,14 @@
 from django.urls import include, path
 from rest_framework import routers
-from . import views
-from .views import CoordinatesViewSet, ImageViewSet, UserViewSet, PassViewSet, submitData
+from .views import *
 
 router = routers.DefaultRouter()
-router.register(r'coordinates', views.CoordinatesViewSet)
-router.register(r'images', views.ImageViewSet)
-router.register(r'users', views.UserViewSet)
-router.register(r'passes', views.PassViewSet)
+router.register(r'coordinates', CoordinatesViewSet)
+router.register(r'images', ImageViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'passes', PassViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('api/submit-data/', views.submitData, name='submit-data'),
+    path('api/submit-data/', submitData, name='submit-data'),
 ]

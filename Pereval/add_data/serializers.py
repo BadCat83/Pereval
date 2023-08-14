@@ -23,10 +23,11 @@ class ImageSerializer(serializers.ModelSerializer):
 class MountainPassSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     coords = CoordinatesSerializer()
-    images = ImageSerializer(many=True)
+    images = ImageSerializer()
 
     class Meta:
         model = MountainPass
-        fields = ['beauty_title', 'title', 'other_titles',
-                  'connect', 'add_time', 'user', 'coords',
-                  'level', 'images', 'status']
+        fields = ['beauty_title', 'title',
+                  'other_titles', 'connect',
+                  'user', 'coords',
+                  'level', 'images']
