@@ -2,11 +2,11 @@ from django.db import models
 
 
 class User(models.Model):
-    first_name = models.CharField(max_length=100, verbose_name='Имя')
-    last_name = models.CharField(max_length=100, verbose_name='Фамилия')
-    surname = models.CharField(max_length=100, blank=True, verbose_name='Отчество')
+    name = models.CharField(max_length=100, verbose_name='Имя')
+    fam = models.CharField(max_length=100, verbose_name='Фамилия')
+    otc = models.CharField(max_length=100, blank=True, verbose_name='Отчество')
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=16)
+    phone = models.CharField(max_length=16)
 
 
 class MountainPass(models.Model):
