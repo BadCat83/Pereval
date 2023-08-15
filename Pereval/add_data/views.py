@@ -107,81 +107,65 @@ class PassViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
-@swagger_auto_schema(method='POST', operation_description="Submit data")
+@swagger_auto_schema(method='POST', operation_description='Submit data')
 @api_view(['POST'])
 def submitData(request):
     data = request.data
-
-    required_fields = ['beauty_title', 'title',
-                       'other_titles', 'connect',
-                       'user', 'coords',
-                       'level', 'images']
+    # Проверка на наличие требуемых полей
+    required_fields = ['beauty_title', 'title', 'other_titles', 'connect',
+                       'user', 'coords', 'level',  'images']
     if not all(field in data for field in required_fields):
-        return Response({'status': 400, 'message': 'There are no all fields filled', 'id': None})
-
+        return Response({'status': 400, 'message': 'There are no all required  field!', 'id': None})
     try:
-        coordinates_data = data['coords']
-        coordinates_serializer = CoordinatesSerializer(data=coordinates_data)
-        if not coordinates_serializer.is_valid():
-            return Response({'status': 400, 'message': 'Invalid coordinates', 'id': None})
-        coordinates = coordinates_serializer.save()
-        print('1')
-
-        user_data = data['user']
-        user_serializer = UserSerializer(data=user_data)
-        if not user_serializer.is_valid():
-            return Response({'status': 400, 'message': 'Invalid user data', 'id': None})
-        user = user_serializer.save()
-        print('2')
         level_data = data.get('level')
-        if level_data is None:
-            return Response({'status': 400, 'message': 'Field "level" is required', 'id': None})
-        print('3')
+
+        # Проверка наличия обязательных параметров в поле level
         required_level_fields = ['winter', 'summer', 'autumn', 'spring']
         if not all(field in level_data for field in required_level_fields):
-            return Response({'status': 400, 'message': 'Missing required fields in "level"', 'id': None})
-        print('4')
+            return Response({'status': 400, 'message': 'Missing required fields in "level!"', 'id': None})
+
+        # Проверка на корректность данных
         if not all(isinstance(level_data[field], str) for field in required_level_fields):
             return Response({'status': 400, 'message': 'Invalid format in "level"', 'id': None})
-        print('5')
+        # Внесение данных по объекту
         pass_data = {
             'beauty_title': data['beauty_title'],
             'title': data['title'],
             'other_titles': data['other_titles'],
             'connect': data['connect'],
-            'add_time': "2021-09-22 13:18:13",
-            'user': user.id,
-            'coords': coordinates.id,
+            'add_time': datetime.now(),
+            'user': data['user'],
+            'coords': data['coords'],
             'level': level_data,
-            'status': "new"
+            'status': 'new'
         }
+        # Сохраняем объект
         pass_serializer = MountainPassSerializer(data=pass_data)
-        if not pass_serializer.is_valid():
+        if not pass_serializer.is_valid(raise_exception=True):
             return Response({'status': 400, 'message': 'Invalid pass data', 'id': None})
         pass_object = pass_serializer.save()
-        print('6')
+        # Работаем с фото
         images_data = data.get('images')
         if images_data is None:
             return Response({'status': 400, 'message': 'Field "images" is required', 'id': None})
-        print('7')
-        required_image_fields = ['data', 'title']
+        # Проверка наличия обязательных подполей в поле images
+        required_image_fields = ['image', 'title']
+        img = []
         for image_data in images_data:
             if not all(field in image_data for field in required_image_fields):
                 return Response({'status': 400, 'message': 'Missing required fields in "images"', 'id': None})
-            print('8')
-            if not isinstance(image_data['data'], str) or not isinstance(image_data['title'], str):
+
+            # Дополнительные проверки формата или значений подполей в поле images
+            if not isinstance(image_data['image'], str) or not isinstance(image_data['title'], str):
                 return Response({'status': 400, 'message': 'Invalid format in "images"', 'id': None})
-            print('9')
-            image_data['pass'] = pass_object.id
+            # Создаем объекты и готовим список для привязки к основному объекту
             image_serializer = ImageSerializer(data=image_data)
             if not image_serializer.is_valid():
                 return Response({'status': 400, 'message': 'Invalid image data', 'id': None})
-            image_serializer.save()
-            print('10')
-        pass_object.status = "new"
-        pass_object.save()
+            img.append(image_serializer.save())
+        # Привязываем фото к объекту
+        pass_object.images.set(img)
 
         return Response({'status': 200, 'message': 'Data submitted successfully', 'id': pass_object.id})
-
     except (ValidationError, Exception) as e:
         return Response({'status': 500, 'message': str(e), 'id': None})
