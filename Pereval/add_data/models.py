@@ -18,7 +18,7 @@ class MountainPass(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     coords = models.ForeignKey('Coordinates', on_delete=models.CASCADE)
     level = models.JSONField(default=dict, blank=True, verbose_name='Сложность прохождения')
-    images = models.ForeignKey('Image', on_delete=models.CASCADE, blank=True, verbose_name='Фотографии')
+    images = models.ManyToManyField('Image', blank=True, verbose_name='Фотографии',)
     status = models.CharField(max_length=15, choices=(
         ('new', 'New'),
         ('pending', 'Pending'),
@@ -40,5 +40,5 @@ class Coordinates(models.Model):
 
 
 class Image(models.Model):
-    data = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='images/')
     title = models.CharField(max_length=100, verbose_name='Описание', blank=True)
