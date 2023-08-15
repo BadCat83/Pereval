@@ -5,7 +5,7 @@ class User(models.Model):
     name = models.CharField(max_length=100, verbose_name='Имя')
     fam = models.CharField(max_length=100, verbose_name='Фамилия')
     otc = models.CharField(max_length=100, blank=True, verbose_name='Отчество')
-    email = models.EmailField()
+    email = models.EmailField(unique=True)
     phone = models.CharField(max_length=16)
 
 
@@ -25,12 +25,6 @@ class MountainPass(models.Model):
         ('accepted', 'Accepted'),
         ('rejected', 'Rejected')
     ), verbose_name='Статус модерирования')
-
-    def create_pass(self, pass_data):
-        pass_object = self.create(**pass_data)
-        pass_object.status = "new"
-        pass_object.save()
-        return pass_object
 
 
 class Coordinates(models.Model):
