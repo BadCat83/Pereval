@@ -84,7 +84,7 @@ class MountainPassSerializer(serializers.ModelSerializer):
     class Meta:
         model = MountainPass
         fields = ['beauty_title', 'title', 'other_titles', 'connect',
-                  'add_time', 'user', 'coords', 'level', 'status']
+                  'add_time', 'user', 'coords', 'level']
 
     # Необходимый метод для создания объектов User и Coordinates
     def create(self, validated_data):
@@ -97,6 +97,8 @@ class MountainPassSerializer(serializers.ModelSerializer):
         if not coord_ser.is_valid():
             return Response({'status': 400, 'message': 'Invalid coordinate data', 'id': None})
         validated_data['coords'] = coord_ser.save()
+
+        validated_data['status'] = 'new'
 
         instance = MountainPass.objects.create(**validated_data)
 
