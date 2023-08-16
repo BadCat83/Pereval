@@ -10,5 +10,6 @@ router.register(r'passes', PassViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('api/submitData/', MountainPassView.as_view(), name='submitData'),
+    path('api/submitData/', MountainPassAddView.as_view(), name='submitData'),
+    path('api/submitData/<int:pk>/', MountainPassEditView.as_view({'get': 'retrieve', 'patch': 'partial_update'})),
 ]
