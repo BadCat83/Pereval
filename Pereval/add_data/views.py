@@ -1,5 +1,4 @@
-from django.http import JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins
 from .serializers import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
@@ -83,7 +82,7 @@ class ImageViewSet(viewsets.ModelViewSet):
 
 class PassViewSet(viewsets.ModelViewSet):
     queryset = MountainPass.objects.all()
-    serializer_class = MountainPassSerializer
+    serializer_class = MountainPassAddSerializer
 
     @swagger_auto_schema(operation_description="Get the list of passes")
     def list(self, request, *args, **kwargs):
@@ -106,15 +105,15 @@ class PassViewSet(viewsets.ModelViewSet):
         return super().destroy(request, *args, **kwargs)
 
 
-class MountainPassView(generics.CreateAPIView):
-    """Класс работы с БД для первого спринта"""
+class MountainPassAddView(generics.CreateAPIView):
+    """Добавление объектов"""
     queryset = MountainPass.objects.all()
-    serializer_class = MountainPassSerializer
+    serializer_class = MountainPassAddSerializer
 
     def post(self, request):
 
         data = request.data
-        pass_serializer = MountainPassSerializer(data=data)
+        pass_serializer = MountainPassAddSerializer(data=data)
         if pass_serializer.is_valid(raise_exception=True):
             pass_object = pass_serializer.save()
             images_data = data.get('images')
@@ -138,3 +137,27 @@ class MountainPassView(generics.CreateAPIView):
             # Привязываем фото к объекту
             pass_object.images.set(img)
             return Response({'status': 200, 'message': 'Data submitted successfully', 'id': pass_object.id})
+
+
+class MountainPassEditView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    """Редактирование объектов"""
+    queryset = MountainPass.objects.all()
+    serializer_class = MountainPassEditSerializer
+
+    def update(self, request, *args, **kwargs):
+
+        pk = kwargs.get("pk", None)
+
+        try:
+            instance = MountainPass.objects.get(pk=pk)
+        except Exception as e:
+            return Response({"Error": f"Произошла следующая ошибка: {e}", "state": 0}, status=400)
+
+        if instance.status != "new":
+            return Response({"message": "Объект прошел стадию модерации, изменить невозможно",
+                             "state": 0}, status=400)
+        else:
+            serializer = MountainPassEditSerializer(data=request.data, instance=instance)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"state": 1}, status=200)
