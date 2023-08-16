@@ -109,4 +109,4 @@ class MountainPassEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = MountainPass
         depth = 1
-        fields = ['beauty_title', 'title', 'other_titles', 'connect', 'user', 'coords', 'level', 'images']
+        fields = ['beauty_title', 'title', 'other_titles', 'connect', 'add_time', 'coords', 'level', 'images']

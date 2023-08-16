@@ -151,7 +151,7 @@ class MountainPassEditView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, v
         try:
             instance = MountainPass.objects.get(pk=pk)
         except Exception as e:
-            return Response({"Error": f"Произошла следующая ошибка: {e}", "state": 0}, status=400)
+            return Response({"message": f"Произошла следующая ошибка: {e}", "state": 0}, status=400)
 
         if instance.status != "new":
             return Response({"message": "Объект прошел стадию модерации, изменить невозможно",
@@ -161,3 +161,23 @@ class MountainPassEditView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, v
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response({"state": 1}, status=200)
+
+
+class UserEmailView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """Получение всех объектов пользователя по почте"""
+    queryset = MountainPass.objects.all()
+    serializer_class = MountainPassEditSerializer
+    print("in class")
+
+    def list(self, request, *args, **kwargs):
+
+        email = kwargs.get('email', None)
+
+        if MountainPass.objects.filter(user__email=email):
+
+            response = MountainPassEditSerializer(MountainPass.objects.filter(user__email=email), many=True).data
+
+        else:
+            response = {'message': f'Такого адреса электронной почты нет в базе = {email}'}
+
+        return Response(response, status=200)
