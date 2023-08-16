@@ -77,7 +77,7 @@ class ImageSerializer(serializers.ModelSerializer):
         fields = ['image', 'title']
 
 
-class MountainPassSerializer(serializers.ModelSerializer):
+class MountainPassAddSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     coords = CoordinatesSerializer()
 
@@ -103,3 +103,10 @@ class MountainPassSerializer(serializers.ModelSerializer):
         instance = MountainPass.objects.create(**validated_data)
 
         return instance
+
+
+class MountainPassEditSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MountainPass
+        depth = 1
+        fields = ['beauty_title', 'title', 'other_titles', 'connect', 'user', 'coords', 'level', 'images']
