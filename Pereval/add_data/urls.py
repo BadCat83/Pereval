@@ -10,5 +10,5 @@ router.register(r'passes', PassViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('api/submit-data/', submitData, name='submit-data'),
+    path('api/submitData/', submitData, name='submitData'),
 ]
