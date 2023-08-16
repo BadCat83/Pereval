@@ -10,5 +10,5 @@ router.register(r'passes', PassViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('api/submitData/', submitData, name='submitData'),
+    path('api/submitData/', MountainPassView.as_view(), name='submitData'),
 ]
